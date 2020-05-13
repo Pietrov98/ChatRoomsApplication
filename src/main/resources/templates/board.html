@@ -1,0 +1,41 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chat application</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+</head>
+
+
+<body>
+   <div class="container">
+    <p>mam tu tekst</p>
+  </div>
+  <!-- <form id="create_room_form" method="GET"> -->
+  <div id="create_room_div">
+    <p>Your name</p>
+    <input type="text" name="user_name" id="user_name" maxlength="20">
+    <button id="start_room_button">Create</button>
+  </div>
+
+<script>
+  $("#start_room_button").click(function() {
+    var user_name = $( "#user_name").val();
+    var regex = /^[0-9a-zA-Z]+$/;
+    if(regex.test(user_name)) 
+    {
+      const url = "/webChat";
+      $.ajax({
+      type : "POST",
+      url : url,
+      data: {name: user_name}
+      });
+      $("#create_room_div").css("display", "none");
+      $("container").css("display", "flex");
+    }
+  });
+</script>
+</body>
+</html>
