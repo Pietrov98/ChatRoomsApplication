@@ -4,24 +4,44 @@
 <head>
   <meta charset="utf-8">
   <title>Chat application</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="main.css">
   <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
 </head>
 
 
 <body>
-   <div class="container">
-    <p>mam tu tekst</p>
+  <div id="board_container">
+    <div id="hello_container"></div>
+    <div id="rooms_container">
+      <button class="room_button" onclick="showCrateRoomForm()">Create own room</button>
+      <button class="room_button">Room1 5/10 private</button>
+      <button class="room_button">Room2 3/3</button>
+      <button class="room_button">Room3 1/4</button>
+      <button class="room_button">Room4 2/2 private</button>
+      <button class="room_button">Room5 3/5</button>
+    </div>
+    <form id ="create_room_form" method="GET">
+      <p>Room name</p>
+      <input type="text" name="room_name">
+      <p>Password (empty input is non-password channel)</p>
+      <input type="password" name="password">
+      <p>Quantity of placeces in room</p>
+      <input type="text" name="qty">
+      <button>Start chatting</button>
+    </form>
   </div>
-  <!-- <form id="create_room_form" method="GET"> -->
-  <div id="create_room_div">
+  <div id="user_form">
     <p>Your name</p>
     <input type="text" name="user_name" id="user_name" maxlength="20">
-    <button id="start_room_button">Create</button>
+    <button id="choose_user_name_button">Create</button>
   </div>
-
 <script>
-  $("#start_room_button").click(function() {
+
+  function showCrateRoomForm(){
+    $("#create_room_form").css("display", "flex");
+  }
+
+  $("#choose_user_name_button").click(function() {
     var user_name = $( "#user_name").val();
     var regex = /^[0-9a-zA-Z]+$/;
     if(regex.test(user_name)) 
@@ -32,10 +52,23 @@
       url : url,
       data: {name: user_name}
       });
-      $("#create_room_div").css("display", "none");
-      $("container").css("display", "flex");
+      $("#user_form").css("display", "none");
+      $("#board_container").css("display", "flex");
+      sessionStorage.setItem("userName", user_name)
+      var helloMessage = "<p>Hello " + sessionStorage.getItem("userName") + ". Let's chat it.</p>";
+      $( "#hello_container" ).append(helloMessage)
     }
   });
+  window.onload = function(){
+    if(sessionStorage.getItem("userName"))
+    {
+      $("#board_container").css("display", "flex");
+      var helloMessage = "<p>Hello " + sessionStorage.getItem("userName") + ". Let's chat</p>";
+      $( "#hello_container" ).append(helloMessage)
+    }  
+    else
+      $("#user_form").css("display", "flex");
+  }
 </script>
 </body>
 </html>
