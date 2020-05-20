@@ -1,0 +1,111 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chat application</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+</head>
+
+
+<body>
+  <div id="board_container">
+    <div id="hello_container"></div>
+    <div id="rooms_container">
+      <!-- <button class="room_button" onclick="showCreateRoomForm()">Create own room</button> -->
+      <!-- <button class="room_button">Room1 5/10 private</button>
+      <button class="room_button">Room2 3/3</button>
+      <button class="room_button">Room3 1/4</button>
+      <button class="room_button">Room4 2/2 private</button>
+      <button class="room_button">Room5 3/5</button> -->
+    </div>
+    <div id ="create_room_form">
+      <p>Room name</p>
+      <input type="text" name="room_name" id="room_name">
+      <p>Password (empty input is non-password channel)</p>
+      <input type="password" name="password" id="password">
+      <p>Quantity of placeces in room</p>
+      <input type="text" name="max_users_number" id="max_users_number">
+      <button id="create_room_button">Start chatting</button>
+    </div>
+  </div>
+  <div id="user_form">
+    <p>Your name</p>
+    <input type="text" name="user_name" id="user_name" maxlength="20">
+    <button id="choose_user_name_button">Create</button>
+  </div>
+<script>
+
+  function showCreateRoomForm(){
+    $("#create_room_form").css("display", "flex");
+  }
+
+  $("#choose_user_name_button").click(function() {
+    var user_name = $( "#user_name").val();
+    var regex = /^[0-9a-zA-Z]+$/;
+    if(regex.test(user_name)) 
+    {
+      const url = "/webChat";
+      $.ajax({
+      type : "GET",
+      url : url,
+      data: {name: user_name}
+      });
+      $("#user_form").css("display", "none");
+      $("#board_container").css("display", "flex");
+      sessionStorage.setItem("userName", user_name)
+      var helloMessage = "<p>Hello " + sessionStorage.getItem("userName") + ". Let's chat it.</p>";
+      $( "#hello_container" ).append(helloMessage)
+    }
+  });
+
+  $("#create_room_button").click(function() {
+    var room_name = $( "#room_name").val();
+    var password = $("#password").val();
+    var max_users_number = $("#max_users_number").val();
+    var regex = /^[0-9]+$/;
+    //porobic zabezpeiczenia
+    //if(regex.test(max_users_number) && room_name < 20) 
+    //{
+      console.log(room_name + " " + password + " " + max_users_number);
+      const url = "/webChat";
+      $.ajax({
+      type : "POST",
+      url : url,
+      data: {room_name: room_name, password: password, max_users_number: max_users_number}
+      });
+      window.location = "/webChat/chatroom";
+   // }
+  });
+
+  window.onload = function(){
+    const $list = $('#rooms_container');
+    $.ajax({
+        url: '/webChat',
+        dataType: 'json',
+        type: 'POST'
+      }).done(function( data ) {
+        $list.empty();
+        $list.append('<button class="room_button" onclick="showCreateRoomForm()">Create own room</button>')
+        $.each( data, function( key, val )
+        {
+          var text = val.roomName + "<br/>" + val.currentUsersNumber + "/" + val.maxUsersNumber;
+            $list.append(`
+            <button class="room_button">${text}</button>
+                    `);
+        });
+    });
+
+    if(sessionStorage.getItem("userName"))
+    {
+      $("#board_container").css("display", "flex");
+      var helloMessage = "<p>Hello " + sessionStorage.getItem("userName") + ". Let's chat</p>";
+      $( "#hello_container" ).append(helloMessage);
+    }  
+    else
+      $("#user_form").css("display", "flex");
+  }
+</script>
+</body>
+</html>
